@@ -34,13 +34,12 @@ public class LecturerServices {
 				   + "M.module_id = A.assessment_belongsTo_module AND "
 				   + "U.user_id = E.user_id AND "
 				   + "E.entry_id = S.entry_FK AND "
-				   + "(M.primary_lecturer LIKE ? OR M.moderator_lecturer LIKE ?) AND "
+				   + "M.primary_lecturer LIKE ? AND "
 				   + "A.areDatesSet = 0";
 		try {
 			Connection conn = dataSource.getConnection();
 			PreparedStatement statement = conn.prepareStatement(sql);
 			statement.setString(1, "%" + lecturerUser.getUsername() + "%");
-			statement.setString(2, "%" + lecturerUser.getUsername() + "%");
 			ResultSet resultSet = statement.executeQuery();
 			while(resultSet.next()) {
 				pendingTasksToSet.getPendingTasksToSetList()
