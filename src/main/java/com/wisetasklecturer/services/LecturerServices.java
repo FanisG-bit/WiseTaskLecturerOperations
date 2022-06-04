@@ -13,6 +13,12 @@ import com.wisetasklecturer.entities.*;
 import com.wisetasklecturer.repositories.TasksRepository;
 import lombok.NoArgsConstructor;
 
+/**
+ * A service class that is being used by the lecturers rest controller and performs
+ * all the respective interactions with the database.
+ * @author Theofanis Gkoufas
+ *
+ */
 @Service
 @NoArgsConstructor
 public class LecturerServices {
@@ -23,6 +29,12 @@ public class LecturerServices {
 	@Autowired
 	TasksRepository tasksRepository;
 	
+	/**
+	 * Retrieves all the pending tasks whose upload and deadline dates needs to be set
+	 * by the lecturer.
+	 * @param lecturerID The id of the lecturer that should set the dates.
+	 * @return The tasks for which the lecturer should set the upload/deadline dates.
+	 */
 	public PendingTasksToSet retrieveDaysToSet(int lecturerID) {
 		User lecturerUser = requestUser(lecturerID);
 		DataSource dataSource = context.getBean(DataSource.class);
@@ -61,11 +73,24 @@ public class LecturerServices {
 		return pendingTasksToSet;
 	}
 
+	/**
+	 * Retrieves the user given the id.
+	 * @param lecturerID The id of the user that we want to get.
+	 * @return The user whose id matches the one given as an argument.
+	 */
 	private User requestUser(int lecturerID) {
 		RestTemplate bean = context.getBean(RestTemplate.class);
 		return bean.getForObject("http://localhost:8028/users/" + lecturerID, User.class);
 	} 
 	
+	/**
+	 * Inserts the upload/deadline dates that are set by the lecturer for a particular assessment.
+	 * @param uploadDate The date when the particular assignment should be made available for the
+	 * students to access.
+	 * @param deadlineDate The date when the particular assignment should finish.
+	 * @param assessmentID The id of the assessment that relates to this task (each task basically
+	 * is related to an assignment).
+	 */
 	public void updateSettedDates(String uploadDate, String deadlineDate, int assessmentID) {
 		DataSource dataSource = context.getBean("dataSource", DataSource.class);
 		Connection connection;
@@ -87,10 +112,19 @@ public class LecturerServices {
 		}
 	}
 	
+	/**
+	 * Inserts a task in the database.
+	 * @param task The task to be inserted.
+	 */
 	public void addTask(Task task) {
 		tasksRepository.save(task);
 	}
 	
+	/**
+	 * Retrieves an assessment given an assessment id.
+	 * @param assessmentId The id of the assessment that we wish to retrieve.
+	 * @return The assessment that matches the id given as a parameter.
+	 */
 	public Assessment getAssessment(int assessmentId) {
 		RestTemplate restTemplate = context.getBean(RestTemplate.class);
 		Assessment assessment = restTemplate.getForObject("http://localhost:8026/admin/assessments/" + assessmentId, 
@@ -98,6 +132,12 @@ public class LecturerServices {
 		return assessment;
 	}
 	
+	/**
+	 * Retrieves the to-do tasks that a lecturer should perform.
+	 * @param lecturerID The id of the lecturer whose to-do list we wish to find.
+	 * @return A TasksToDo instance, containing a list of the to-do tasks that 
+	 * should be performed by the corresponding lecturer.
+	 */
 	public TasksToDo getTasksToDo(int lecturerID) {
 		User lecturer = getLecturerBasedOnId(lecturerID);
 		DataSource dataSource = context.getBean(DataSource.class);
@@ -137,12 +177,23 @@ public class LecturerServices {
 		return tasksToDo;
 	}
 	
+	/**
+	 * Retrieves a lecturer given an id.
+	 * @param lecturerID The id of the lecturer that we wish to retrieve.
+	 * @return The lecturer that matches the given id.
+	 */
 	private User getLecturerBasedOnId(int lecturerID) {
 		RestTemplate restTemplate = context.getBean(RestTemplate.class);
 		User lecturer = restTemplate.getForObject("http://localhost:8028/users/" + lecturerID, User.class);
 		return lecturer;
 	}
 
+	/**
+	 * Changes a task's visibility so that it won't be displayed
+	 * in as a to-do task. Basically the task's status changes to
+	 * true (meaning that the task has been fulfilled).
+	 * @param taskID The task whose visibility we want to change.
+	 */
 	public void changeTaskVisibility(int taskID) {
 		Task task = tasksRepository.findById(taskID).get();
 		task.setCompleted(true);

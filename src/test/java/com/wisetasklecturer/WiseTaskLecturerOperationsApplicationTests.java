@@ -21,6 +21,12 @@ import com.wisetasklecturer.entities.TaskToDo;
 import com.wisetasklecturer.entities.TasksToDo;
 import com.wisetasklecturer.services.LecturerServices;
 
+/**
+ * A test class responsible for testing a number of methods provided
+ * by the lecturers REST API.
+ * @author Theofanis Gkoufas
+ *
+ */
 @WebMvcTest(controllers = LecturerOperationsController.class)
 class WiseTaskLecturerOperationsApplicationTests {
 
